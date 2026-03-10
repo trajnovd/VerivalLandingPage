@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
-import { ArrowRight, Play } from 'lucide-react'
+import { ArrowRight, Eye } from 'lucide-react'
+import { useLanguage } from '@/i18n/LanguageContext'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -15,6 +16,8 @@ const fadeUp = {
 }
 
 export default function Hero() {
+  const { t } = useLanguage()
+
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 pt-20">
       {/* Gradient overlays */}
@@ -31,7 +34,7 @@ export default function Hero() {
         >
           <span className="h-2 w-2 rounded-full bg-accent" />
           <span className="text-sm tracking-wide text-text-muted">
-            Now in Public Beta
+            {t.hero.badge}
           </span>
         </motion.div>
 
@@ -40,14 +43,14 @@ export default function Hero() {
           variants={fadeUp}
           initial="hidden"
           animate="visible"
-          className="mb-6 font-heading text-5xl font-bold leading-[1.1] tracking-tight sm:text-6xl md:text-7xl lg:text-8xl"
+          className="mb-6 font-heading text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
         >
           <span className="bg-gradient-to-b from-white to-white/80 bg-clip-text text-transparent">
-            Build the Future
+            {t.hero.headline1}
           </span>
           <br />
           <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-            With Verival
+            {t.hero.headline2}
           </span>
         </motion.h1>
 
@@ -58,8 +61,7 @@ export default function Hero() {
           animate="visible"
           className="mx-auto mb-10 max-w-2xl text-base leading-relaxed text-text-muted sm:text-lg md:text-xl"
         >
-          The all-in-one platform that transforms how teams design, develop, and
-          deploy digital experiences. Powered by AI, crafted for humans.
+          {t.hero.subheadline}
         </motion.p>
 
         <motion.div
@@ -70,39 +72,51 @@ export default function Hero() {
           className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
         >
           <a
-            href="#pricing"
+            href="#early-access"
             className="group flex cursor-pointer items-center gap-2 rounded-2xl bg-gradient-to-r from-primary to-accent px-8 py-4 text-base font-semibold text-white transition-all duration-200 hover:shadow-[0_0_30px_rgba(14,165,233,0.4)]"
           >
-            Start Building Free
+            {t.hero.ctaPrimary}
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </a>
           <a
-            href="#about"
+            href="#how-it-works"
             className="flex cursor-pointer items-center gap-2 rounded-2xl border border-border px-8 py-4 text-base font-medium text-text-muted transition-all duration-200 hover:border-text-dim hover:text-text"
           >
-            <Play className="h-4 w-4" />
-            Watch Demo
+            <Eye className="h-4 w-4" />
+            {t.hero.ctaSecondary}
           </a>
         </motion.div>
 
-        {/* Stats */}
+        {/* Trust Bar */}
         <motion.div
           custom={4}
           variants={fadeUp}
           initial="hidden"
           animate="visible"
-          className="mt-16 grid grid-cols-3 gap-8 border-t border-border pt-8"
+          className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-text-dim"
         >
-          {[
-            { value: '10K+', label: 'Active Teams' },
-            { value: '99.9%', label: 'Uptime SLA' },
-            { value: '2.5x', label: 'Faster Delivery' },
-          ].map((stat) => (
+          {t.hero.trustBar.map((item, i) => (
+            <span key={i}>
+              {i > 0 && <span className="mr-6 hidden sm:inline">&#183;</span>}
+              {item}
+            </span>
+          ))}
+        </motion.div>
+
+        {/* Key Metrics */}
+        <motion.div
+          custom={5}
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          className="mt-12 grid grid-cols-2 gap-6 border-t border-border pt-8 sm:grid-cols-4"
+        >
+          {t.hero.stats.map((stat) => (
             <div key={stat.label} className="text-center">
               <div className="font-heading text-2xl font-bold text-text sm:text-3xl">
                 {stat.value}
               </div>
-              <div className="mt-1 text-sm text-text-dim">{stat.label}</div>
+              <div className="mt-1 text-xs text-text-dim sm:text-sm">{stat.label}</div>
             </div>
           ))}
         </motion.div>

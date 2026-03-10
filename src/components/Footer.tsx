@@ -1,23 +1,8 @@
-const footerLinks = [
-  {
-    title: 'Product',
-    links: ['Features', 'Pricing', 'Integrations', 'Changelog', 'Docs'],
-  },
-  {
-    title: 'Company',
-    links: ['About', 'Blog', 'Careers', 'Press', 'Partners'],
-  },
-  {
-    title: 'Resources',
-    links: ['Community', 'Help Center', 'Tutorials', 'API Reference', 'Status'],
-  },
-  {
-    title: 'Legal',
-    links: ['Privacy', 'Terms', 'Security', 'Cookies'],
-  },
-]
+import { useLanguage } from '@/i18n/LanguageContext'
 
 export default function Footer() {
+  const { t } = useLanguage()
+
   return (
     <footer className="border-t border-border px-4 py-16">
       <div className="mx-auto max-w-6xl">
@@ -31,14 +16,22 @@ export default function Footer() {
                   <path d="M2 12l10 5 10-5" />
                 </svg>
               </div>
-              Verival
+              VERIVAL
             </a>
             <p className="mt-4 text-sm leading-relaxed text-text-dim">
-              Building the future of team collaboration with AI-powered workflows.
+              {t.footer.tagline}
+            </p>
+            <p className="mt-2 text-xs text-text-dim">
+              Ulica Jozeta Jame 14
+              <br />
+              1000 Ljubljana, Slovenija
+            </p>
+            <p className="mt-2 text-xs text-text-dim">
+              info@verival.si
             </p>
           </div>
 
-          {footerLinks.map((section) => (
+          {t.footer.columns.map((section) => (
             <div key={section.title}>
               <h4 className="mb-4 font-heading text-sm font-semibold text-text">
                 {section.title}
@@ -58,10 +51,10 @@ export default function Footer() {
 
         <div className="flex flex-col items-center justify-between gap-4 border-t border-border pt-8 md:flex-row">
           <p className="text-sm text-text-dim">
-            &copy; {new Date().getFullYear()} Verival. All rights reserved.
+            &copy; {new Date().getFullYear()} {t.footer.copyright}
           </p>
           <div className="flex gap-6">
-            {['Twitter', 'GitHub', 'LinkedIn', 'Discord'].map((social) => (
+            {['LinkedIn'].map((social) => (
               <a
                 key={social}
                 href="#"

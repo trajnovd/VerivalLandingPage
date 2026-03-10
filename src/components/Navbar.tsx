@@ -1,24 +1,28 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Globe } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-const navItems = [
-  { name: 'Features', href: '#features' },
-  { name: 'About', href: '#about' },
-  { name: 'Testimonials', href: '#testimonials' },
-  { name: 'Pricing', href: '#pricing' },
-]
+import { useLanguage } from '@/i18n/LanguageContext'
 
 export default function Navbar() {
+  const { lang, setLang, t } = useLanguage()
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  const navItems = [
+    { name: t.nav.product, href: '#product' },
+    { name: t.nav.howItWorks, href: '#how-it-works' },
+    { name: t.nav.earlyAccess, href: '#early-access' },
+    { name: t.nav.about, href: '#about' },
+  ]
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50)
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  const toggleLang = () => setLang(lang === 'en' ? 'si' : 'en')
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
@@ -42,7 +46,7 @@ export default function Navbar() {
             </svg>
           </div>
           <span className="bg-gradient-to-r from-text to-text-muted bg-clip-text text-transparent">
-            Verival
+            VERIVAL
           </span>
         </a>
 
@@ -59,17 +63,19 @@ export default function Navbar() {
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
-          <a
-            href="#"
-            className="rounded-xl px-4 py-2 text-sm text-text-muted transition-colors hover:text-text"
+          <button
+            onClick={toggleLang}
+            className="flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-2 text-sm text-text-muted transition-colors hover:text-text"
+            aria-label="Switch language"
           >
-            Log In
-          </a>
+            <Globe className="h-4 w-4" />
+            <span className="font-medium">{lang === 'en' ? 'SI' : 'EN'}</span>
+          </button>
           <a
-            href="#"
+            href="#early-access"
             className="cursor-pointer rounded-xl bg-gradient-to-r from-primary to-accent px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 hover:shadow-[0_0_20px_rgba(14,165,233,0.3)]"
           >
-            Get Started
+            {t.nav.joinPilot}
           </a>
         </div>
 
@@ -102,12 +108,19 @@ export default function Navbar() {
                 </a>
               ))}
               <hr className="border-border" />
-              <a href="#" className="text-base text-text-muted">Log In</a>
+              <button
+                onClick={toggleLang}
+                className="flex cursor-pointer items-center gap-1.5 text-base text-text-muted"
+              >
+                <Globe className="h-4 w-4" />
+                {lang === 'en' ? 'Slovenščina' : 'English'}
+              </button>
               <a
-                href="#"
+                href="#early-access"
+                onClick={() => setMobileOpen(false)}
                 className="cursor-pointer rounded-xl bg-gradient-to-r from-primary to-accent px-5 py-2.5 text-center text-sm font-semibold text-white"
               >
-                Get Started
+                {t.nav.joinPilot}
               </a>
             </div>
           </motion.div>
