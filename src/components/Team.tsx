@@ -60,7 +60,7 @@ const team = [
   },
   {
     name: 'Darko Trajanov',
-    role: { en: 'Software Developer', si: 'Razvijalec programske opreme' },
+    role: { en: 'Co-Founder & Software Developer', si: 'Soustanovitelj in razvijalec programske opreme' },
     bio: {
       en: 'Computer Science student at FINKI and full-stack developer specializing in AI-powered products. Published researcher at CIIT 2025 on multi-agent AI systems and winner of multiple hackathons.',
       si: 'Študent računalništva na FINKI in full-stack razvijalec, specializiran za produkte, ki jih poganja umetna inteligenca. Objavljeni raziskovalec na CIIT 2025 o večagentnih AI sistemih in zmagovalec več hekatonov.',
