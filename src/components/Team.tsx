@@ -4,11 +4,11 @@ import { useLanguage } from '@/i18n/LanguageContext'
 
 const team = [
   {
-    name: 'Dimitar Trajanov',
-    role: { en: 'Co-Founder', si: 'Soustanovitelj' },
+    name: 'Prof. dr. Dimitar Trajanov',
+    role: { en: 'Co-Founder & AI Advisor', si: 'Soustanovitelj in AI mentor' },
     bio: {
-      en: 'PhD in Computer Science with deep expertise in AI systems and software architecture.',
-      si: 'Doktor računalniških znanosti z bogatimi izkušnjami na področju AI sistemov in programske arhitekture.',
+      en: 'Visiting Research Professor at Boston University and Full Professor at FINKI, Ss. Cyril and Methodius University. Elected Associate Member of the Macedonian Academy of Sciences and Arts in 2025. Author of 200+ papers and 7 books, with research in AI, Data Science, and NLP.',
+      si: 'Gostujoči raziskovalni profesor na Boston University in redni profesor na FINKI, Univerza Sv. Cirila in Metoda. Leta 2025 izvoljen za izrednega člana Makedonske akademije znanosti in umetnosti. Avtor več kot 200 člankov in 7 knjig s področij umetne inteligence, podatkovnih znanosti in NLP.',
     },
     initials: 'DT',
     image: '/images/Dimitar Trajanov pp.jpeg',
