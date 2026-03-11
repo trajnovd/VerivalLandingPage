@@ -5,7 +5,7 @@ import { useLanguage } from '@/i18n/LanguageContext'
 const team = [
   {
     name: 'Prof. dr. Dimitar Trajanov',
-    role: { en: 'Co-Founder & AI Advisor', si: 'Soustanovitelj in AI mentor' },
+    role: { en: 'AI Advisor', si: 'AI mentor' },
     bio: {
       en: 'Visiting Research Professor at Boston University and Full Professor at FINKI, Ss. Cyril and Methodius University. Elected Associate Member of the Macedonian Academy of Sciences and Arts in 2025. Author of 200+ papers and 7 books, with research in AI, Data Science, and NLP.',
       si: 'Gostujoči raziskovalni profesor na Boston University in redni profesor na FINKI, Univerza Sv. Cirila in Metoda. Leta 2025 izvoljen za izrednega člana Makedonske akademije znanosti in umetnosti. Avtor več kot 200 člankov in 7 knjig s področij umetne inteligence, podatkovnih znanosti in NLP.',
@@ -16,7 +16,7 @@ const team = [
   },
   {
     name: 'Vladimir Chakarov',
-    role: { en: 'Co-Founder & CEO', si: 'Soustanovitelj in direktor' },
+    role: { en: 'CEO', si: 'Direktor' },
     bio: {
       en: 'CEO of VERIVAL and project lead for reValu8. Founder of PELAGUS IT with deep experience in B2B software solutions and data systems. Co-founded ParkSpot, a parking tech startup in North Macedonia.',
       si: 'Direktor VERIVAL in vodja izvedbe projekta reValu8. Ustanovitelj PELAGUS IT z dolgoletnimi izkušnjami pri razvoju kompleksnih B2B rešitev in podatkovnih sistemov. Soustanovitelj ParkSpot, startup podjetja na področju parkiranja v Severni Makedoniji.',
@@ -27,7 +27,7 @@ const team = [
   },
   {
     name: 'Mag. Ermina Bender',
-    role: { en: 'Co-Founder & Domain Expert', si: 'Soustanoviteljica in strokovna nosilka' },
+    role: { en: 'Domain Expert', si: 'Strokovna nosilka' },
     bio: {
       en: 'Licensed real estate valuator and domain expert for reValu8. Holds an MSc in Economics (Finance) and a degree in Electrical Engineering, with 15+ years of experience in insolvency proceedings where valuations are a key decision-making tool.',
       si: 'Pooblaščena ocenjevalka vrednosti nepremičnin in strokovna nosilka domenskega področja v projektu reValu8. Magistrica ekonomije (finance) in univ. dipl. inž. elektrotehnike z več kot 15-letnimi izkušnjami v insolvenčnih postopkih, kjer so cenitve ključno orodje za odločanje.',
@@ -38,7 +38,7 @@ const team = [
   },
   {
     name: 'Mag. Risto Trajanov',
-    role: { en: 'Co-Founder & AI/ML Lead', si: 'Soustanovitelj in vodja AI/ML' },
+    role: { en: 'AI/ML Lead', si: 'Vodja AI/ML' },
     bio: {
       en: 'Data Scientist at Deutser and Fulbright Scholar with an M.S. in Data Science from Rice University. Leads AI/ML development at VERIVAL, designing the multi-agent architecture for automated property appraisals. Previously co-founded Amectron (Boston), securing a $50,000 NSF grant.',
       si: 'Podatkovni znanstvenik v podjetju Deutser in Fulbrightov štipendist z magisterijem iz podatkovnih znanosti na Rice University. Vodi AI/ML razvoj v podjetju VERIVAL ter načrtuje večagentni sistem za avtomatizirane cenitve nepremičnin. Prej soustanovitelj Amectron (Boston), kjer je pridobil 50.000 USD nepovratnih sredstev NSF.',
@@ -49,7 +49,7 @@ const team = [
   },
   {
     name: 'Andrej Krstevski',
-    role: { en: 'Co-Founder & System Architect', si: 'Soustanovitelj in sistemski arhitekt' },
+    role: { en: 'System Architect', si: 'Sistemski arhitekt' },
     bio: {
       en: 'CTO & Solutions Delivery Lead at PELAGUS IT with 10+ years building scalable systems and infrastructure. Leads system architecture at VERIVAL, focusing on security, access management, and data source integrations.',
       si: 'CTO in vodja izvedbe rešitev v PELAGUS IT z več kot desetletjem izkušenj pri razvoju skalabilnih sistemov in infrastrukture. V projektu reValu8 vodi sistemsko arhitekturo s poudarkom na varnosti, upravljanju dostopov in integracijah podatkovnih virov.',
@@ -60,7 +60,7 @@ const team = [
   },
   {
     name: 'Darko Trajanov',
-    role: { en: 'Co-Founder & Software Developer', si: 'Soustanovitelj in razvijalec programske opreme' },
+    role: { en: 'Software Developer', si: 'Razvijalec programske opreme' },
     bio: {
       en: 'Computer Science student at FINKI and full-stack developer specializing in AI-powered products. Published researcher at CIIT 2025 on multi-agent AI systems and winner of multiple hackathons.',
       si: 'Študent računalništva na FINKI in full-stack razvijalec, specializiran za produkte, ki jih poganja umetna inteligenca. Objavljeni raziskovalec na CIIT 2025 o večagentnih AI sistemih in zmagovalec več hekatonov.',
