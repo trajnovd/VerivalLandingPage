@@ -6,39 +6,54 @@ const team = [
   {
     name: 'Dimitar Trajanov',
     role: { en: 'Co-Founder', si: 'Soustanovitelj' },
-    bio: { en: 'PhD in Computer Science', si: 'Doktor računalniških znanosti' },
+    bio: {
+      en: 'PhD in Computer Science with deep expertise in AI systems and software architecture.',
+      si: 'Doktor računalniških znanosti z bogatimi izkušnjami na področju AI sistemov in programske arhitekture.',
+    },
     initials: 'DT',
     image: '/images/Dimitar Trajanov pp.jpeg',
     gradient: 'from-blue-500 to-cyan-500',
   },
   {
     name: 'Vladimir Chakarov',
-    role: { en: 'Co-Founder', si: 'Soustanovitelj' },
-    bio: { en: 'Serial entrepreneur with multiple businesses', si: 'Serijski podjetnik z več podjetji' },
+    role: { en: 'Co-Founder & CEO', si: 'Soustanovitelj in direktor' },
+    bio: {
+      en: 'CEO of VERIVAL and project lead for reValu8. Founder of PELAGUS IT with deep experience in B2B software solutions and data systems. Co-founded ParkSpot, a parking tech startup in North Macedonia.',
+      si: 'Direktor VERIVAL in vodja izvedbe projekta reValu8. Ustanovitelj PELAGUS IT z dolgoletnimi izkušnjami pri razvoju kompleksnih B2B rešitev in podatkovnih sistemov. Soustanovitelj ParkSpot, startup podjetja na področju parkiranja v Severni Makedoniji.',
+    },
     initials: 'VC',
     image: '/images/Vladimir Chararov pp.jpeg',
     gradient: 'from-violet-500 to-purple-500',
   },
   {
-    name: 'Ermina Chakarova',
-    role: { en: 'Co-Founder', si: 'Soustanoviteljica' },
-    bio: { en: 'Licensed real estate valuator in Slovenia', si: 'Pooblaščena cenilka nepremičnin v Sloveniji' },
-    initials: 'EC',
+    name: 'Mag. Ermina Bender',
+    role: { en: 'Co-Founder & Domain Expert', si: 'Soustanoviteljica in strokovna nosilka' },
+    bio: {
+      en: 'Licensed real estate valuator and domain expert for reValu8. Holds an MSc in Economics (Finance) and a degree in Electrical Engineering, with 15+ years of experience in insolvency proceedings where valuations are a key decision-making tool.',
+      si: 'Pooblaščena ocenjevalka vrednosti nepremičnin in strokovna nosilka domenskega področja v projektu reValu8. Magistrica ekonomije (finance) in univ. dipl. inž. elektrotehnike z več kot 15-letnimi izkušnjami v insolvenčnih postopkih, kjer so cenitve ključno orodje za odločanje.',
+    },
+    initials: 'EB',
     image: null,
     gradient: 'from-emerald-500 to-green-500',
   },
   {
-    name: 'Risto Trajanov',
-    role: { en: 'Data Scientist & Developer', si: 'Podatkovni znanstvenik in razvijalec' },
-    bio: { en: '', si: '' },
+    name: 'Mag. Risto Trajanov',
+    role: { en: 'Co-Founder & AI/ML Lead', si: 'Soustanovitelj in vodja AI/ML' },
+    bio: {
+      en: 'Data Scientist at Deutser and Fulbright Scholar with an M.S. in Data Science from Rice University. Leads AI/ML development at VERIVAL, designing the multi-agent architecture for automated property appraisals. Previously co-founded Amectron (Boston), securing a $50,000 NSF grant.',
+      si: 'Podatkovni znanstvenik v podjetju Deutser in Fulbrightov štipendist z magisterijem iz podatkovnih znanosti na Rice University. Vodi AI/ML razvoj v podjetju VERIVAL ter načrtuje večagentni sistem za avtomatizirane cenitve nepremičnin. Prej soustanovitelj Amectron (Boston), kjer je pridobil 50.000 USD nepovratnih sredstev NSF.',
+    },
     initials: 'RT',
     image: '/images/Risto Trajanov pp.jpeg',
     gradient: 'from-amber-500 to-orange-500',
   },
   {
     name: 'Andrej Krstevski',
-    role: { en: 'Backend Engineer & System Architect', si: 'Backend inženir in sistemski arhitekt' },
-    bio: { en: '', si: '' },
+    role: { en: 'Co-Founder & System Architect', si: 'Soustanovitelj in sistemski arhitekt' },
+    bio: {
+      en: 'CTO & Solutions Delivery Lead at PELAGUS IT with 10+ years building scalable systems and infrastructure. Leads system architecture at VERIVAL, focusing on security, access management, and data source integrations.',
+      si: 'CTO in vodja izvedbe rešitev v PELAGUS IT z več kot desetletjem izkušenj pri razvoju skalabilnih sistemov in infrastrukture. V projektu reValu8 vodi sistemsko arhitekturo s poudarkom na varnosti, upravljanju dostopov in integracijah podatkovnih virov.',
+    },
     initials: 'AK',
     image: '/images/Andrej Krstevski pp.jpeg',
     gradient: 'from-rose-500 to-pink-500',
@@ -46,7 +61,10 @@ const team = [
   {
     name: 'Darko Trajanov',
     role: { en: 'Software Developer', si: 'Razvijalec programske opreme' },
-    bio: { en: '', si: '' },
+    bio: {
+      en: 'Computer Science student at FINKI and full-stack developer specializing in AI-powered products. Published researcher at CIIT 2025 on multi-agent AI systems and winner of multiple hackathons.',
+      si: 'Študent računalništva na FINKI in full-stack razvijalec, specializiran za produkte, ki jih poganja umetna inteligenca. Objavljeni raziskovalec na CIIT 2025 o večagentnih AI sistemih in zmagovalec več hekatonov.',
+    },
     initials: 'DT',
     image: '/images/darkopp.jpeg',
     gradient: 'from-sky-500 to-blue-500',
@@ -107,11 +125,11 @@ export default function Team() {
                     {member.name}
                   </h3>
                   <p className="text-sm text-text-muted">{member.role[lang]}</p>
-                  {member.bio[lang] && (
-                    <p className="mt-1.5 text-xs text-text-dim">{member.bio[lang]}</p>
-                  )}
                 </div>
               </div>
+              {member.bio[lang] && (
+                <p className="mt-4 text-xs leading-relaxed text-text-dim">{member.bio[lang]}</p>
+              )}
             </motion.div>
           ))}
         </div>
