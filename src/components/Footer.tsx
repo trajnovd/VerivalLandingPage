@@ -27,7 +27,7 @@ export default function Footer() {
               1000 Ljubljana, Slovenija
             </p>
             <p className="mt-2 text-xs text-text-dim">
-              info@verival.si
+              support@verival.si
             </p>
           </div>
 

@@ -78,7 +78,7 @@ export default function Pricing() {
             <div className="mt-6 flex items-center gap-2 text-sm text-text-dim">
               <Mail className="h-4 w-4" />
               <span>{t.earlyAccess.contactLabel} </span>
-              <a href="mailto:info@verival.si" className="text-primary hover:underline">info@verival.si</a>
+              <a href="mailto:support@verival.si" className="text-primary hover:underline">support@verival.si</a>
             </div>
           </motion.div>
 

@@ -74,7 +74,7 @@ export const en = {
     companyDetails: [
       { value: 'VERIVAL d.o.o.', label: 'Company' },
       { value: 'Ljubljana', label: 'Headquarters' },
-      { value: '2025', label: 'Founded' },
+      { value: '2026', label: 'Founded' },
       { value: 'PropTech / AI', label: 'Industry' },
     ],
     valuesHeading: 'Our Values',
