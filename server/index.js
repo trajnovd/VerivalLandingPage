@@ -16,6 +16,8 @@ const allowedOrigin = process.env.ALLOWED_ORIGIN
 const port = Number(process.env.PORT || 3001)
 const recaptchaSecretKey = process.env.RECAPTCHA_SECRET_KEY
 const recaptchaVerifyUrl = process.env.RECAPTCHA_VERIFY_URL || 'https://www.google.com/recaptcha/api/siteverify'
+const recaptchaMinScore = Number(process.env.RECAPTCHA_MIN_SCORE || 0.3)
+const recaptchaExpectedAction = process.env.RECAPTCHA_EXPECTED_ACTION || 'submit'
 
 app.use(express.json())
 app.use(
@@ -57,14 +59,15 @@ async function verifyRecaptcha(token, remoteIp) {
   }
 
   const result = await response.json()
-  
+
   // reCAPTCHA v3 returns success: true and a score (0.0-1.0)
   // v2 returns only success: true
-  // For v3, accept score >= 0.5 (adjust threshold as needed)
+  // For v3, enforce action and score threshold.
   if (result.score !== undefined) {
-    return result.success === true && result.score >= 0.5
+    const actionMatches = !result.action || result.action === recaptchaExpectedAction
+    return result.success === true && actionMatches && result.score >= recaptchaMinScore
   }
-  
+
   // For v2, just check success
   return result.success === true
 }

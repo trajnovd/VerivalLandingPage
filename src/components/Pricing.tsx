@@ -14,6 +14,7 @@ type CaptchaApi = {
     },
   ) => string | number
   reset: (widgetId?: string | number) => void
+  ready: (cb: () => void) => void
   execute: (siteKey: string, options: { action: string }) => Promise<string>
 }
 
@@ -33,6 +34,7 @@ export default function Pricing() {
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [recaptchaReady, setRecaptchaReady] = useState(false)
 
   useEffect(() => {
     if (!recaptchaSiteKey) {
@@ -47,10 +49,25 @@ export default function Pricing() {
 
     const script = document.createElement('script')
     script.id = scriptId
-    script.src = 'https://www.google.com/recaptcha/api.js'
+    script.src = `https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(recaptchaSiteKey)}`
     script.async = true
     script.defer = true
+    script.onload = () => {
+      if (!window.grecaptcha) {
+        return
+      }
+
+      window.grecaptcha.ready(() => {
+        setRecaptchaReady(true)
+      })
+    }
     document.head.appendChild(script)
+
+    if (window.grecaptcha) {
+      window.grecaptcha.ready(() => {
+        setRecaptchaReady(true)
+      })
+    }
   }, [recaptchaSiteKey])
 
   const updateField = (field: 'firstName' | 'lastName' | 'email', value: string) => {
@@ -68,11 +85,26 @@ export default function Pricing() {
 
     try {
       let captchaToken = ''
-      
-      // Get reCAPTCHA v3 token
-      if (recaptchaSiteKey && window.grecaptcha) {
+
+      // Get reCAPTCHA v3 token right before submit.
+      if (recaptchaSiteKey) {
+        if (!window.grecaptcha || !recaptchaReady) {
+          setError(t.earlyAccess.captchaErrorMessage)
+          setSubmitting(false)
+          return
+        }
+
         try {
+          await new Promise<void>((resolve) => {
+            window.grecaptcha?.ready(() => resolve())
+          })
           captchaToken = await window.grecaptcha.execute(recaptchaSiteKey, { action: 'submit' })
+
+          if (!captchaToken) {
+            setError(t.earlyAccess.captchaErrorMessage)
+            setSubmitting(false)
+            return
+          }
         } catch (err) {
           console.error('reCAPTCHA execute failed:', err)
           setError(t.earlyAccess.captchaErrorMessage)
