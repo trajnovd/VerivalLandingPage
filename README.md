@@ -65,6 +65,58 @@ npm run build
 npm run preview
 ```
 
+## Docker (Single Service)
+
+This repo includes a single-container setup named `verival-web`:
+
+- Nginx serves the built frontend
+- Node.js runs the Express + Nodemailer signup endpoint inside the same container
+
+Nginx proxies `/api/*` to the local Node process (`127.0.0.1:3001`) in that same container.
+
+### 1) Prepare backend env
+
+Create `server/.env` (or copy from `server/.env.example`) and fill SMTP values.
+
+If you want anti-spam CAPTCHA, also set:
+
+- `RECAPTCHA_SECRET_KEY` in `server/.env`
+- `VITE_RECAPTCHA_SITE_KEY` in a root `.env` file used by Docker Compose build
+
+Example root `.env`:
+
+```bash
+VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
+```
+
+### 2) Build and start
+
+```bash
+docker compose up -d --build
+```
+
+When you change `VITE_RECAPTCHA_SITE_KEY`, rebuild the image:
+
+```bash
+docker compose up -d --build
+```
+
+### 3) Open app
+
+- `http://localhost:8080`
+
+### 4) Logs / stop
+
+```bash
+docker compose logs -f
+docker compose down
+```
+
+### Production note
+
+- For production, map `verival-web` to port `80:80` (or put it behind your existing reverse proxy).
+- Keep `server/.env` only on the server and never commit it.
+
 ---
 
 ## Migrating from GitHub to GitLab

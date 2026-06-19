@@ -150,6 +150,9 @@ export const en = {
     submitting: 'Submitting...',
     successHeading: "You\u2019re on the list!",
     successMessage: "We\u2019ll be in touch soon with next steps.",
+    errorMessage: 'Something went wrong. Please try again or email us at support@verival.si.',
+    captchaRequiredMessage: 'Please complete the CAPTCHA and try again.',
+    captchaErrorMessage: 'CAPTCHA verification failed. Please try again.',
   },
   cta: {
     heading1: 'Be Among the First.',

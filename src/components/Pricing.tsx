@@ -1,23 +1,156 @@
 import { motion, useInView } from 'framer-motion'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Check, ArrowRight, Mail, Loader2 } from 'lucide-react'
 import { useLanguage } from '@/i18n/LanguageContext'
+
+type CaptchaApi = {
+  render: (
+    container: HTMLElement,
+    options: {
+      sitekey: string
+      callback: (token: string) => void
+      'expired-callback'?: () => void
+      'error-callback'?: () => void
+    },
+  ) => string | number
+  reset: (widgetId?: string | number) => void
+}
+
+declare global {
+  interface Window {
+    grecaptcha?: CaptchaApi
+  }
+}
 
 export default function Pricing() {
   const { t } = useLanguage()
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
+  const signupEndpoint = import.meta.env.VITE_SIGNUP_ENDPOINT ?? '/api/early-access'
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY
+  const captchaContainerRef = useRef<HTMLDivElement | null>(null)
+  const captchaWidgetIdRef = useRef<string | number | null>(null)
   const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '' })
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [captchaToken, setCaptchaToken] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const resetCaptcha = () => {
+    if (!recaptchaSiteKey || !window.grecaptcha) {
+      return
+    }
+
+    if (captchaWidgetIdRef.current !== null) {
+      window.grecaptcha.reset(captchaWidgetIdRef.current)
+    }
+    setCaptchaToken('')
+  }
+
+  useEffect(() => {
+    if (!recaptchaSiteKey || !captchaContainerRef.current) {
+      return
+    }
+
+    const renderWidget = () => {
+      if (!window.grecaptcha || !captchaContainerRef.current || captchaWidgetIdRef.current !== null) {
+        return
+      }
+
+      captchaWidgetIdRef.current = window.grecaptcha.render(captchaContainerRef.current, {
+        sitekey: recaptchaSiteKey,
+        callback: (token) => {
+          setCaptchaToken(token)
+          setError(null)
+        },
+        'expired-callback': () => {
+          setCaptchaToken('')
+        },
+        'error-callback': () => {
+          setCaptchaToken('')
+          setError(t.earlyAccess.captchaErrorMessage)
+        },
+      })
+    }
+
+    if (window.grecaptcha) {
+      renderWidget()
+      return
+    }
+
+    const scriptId = 'google-recaptcha-script'
+    const existingScript = document.getElementById(scriptId) as HTMLScriptElement | null
+    if (existingScript) {
+      existingScript.addEventListener('load', renderWidget, { once: true })
+      return () => {
+        existingScript.removeEventListener('load', renderWidget)
+      }
+    }
+
+    const script = document.createElement('script')
+    script.id = scriptId
+  script.src = 'https://www.google.com/recaptcha/api.js?render=explicit'
+    script.async = true
+    script.defer = true
+    script.addEventListener('load', renderWidget, { once: true })
+    document.head.appendChild(script)
+
+    return () => {
+      script.removeEventListener('load', renderWidget)
+    }
+  }, [recaptchaSiteKey, t.earlyAccess.captchaErrorMessage])
+
+  const updateField = (field: 'firstName' | 'lastName' | 'email', value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+    if (error) {
+      setError(null)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (recaptchaSiteKey && !captchaToken) {
+      setError(t.earlyAccess.captchaRequiredMessage)
+      return
+    }
+
     setSubmitting(true)
-    setTimeout(() => {
-      setSubmitting(false)
+    setError(null)
+
+    try {
+      const response = await fetch(signupEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          captchaToken,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorPayload = await response.json().catch(() => null)
+        const apiError = typeof errorPayload?.error === 'string' ? errorPayload.error : ''
+
+        if (apiError.includes('Captcha')) {
+          setError(t.earlyAccess.captchaErrorMessage)
+        } else {
+          setError(t.earlyAccess.errorMessage)
+        }
+
+        resetCaptcha()
+        return
+      }
+
       setSubmitted(true)
-    }, 1000)
+    } catch (submitError) {
+      console.error('Early access submission failed:', submitError)
+      setError(t.earlyAccess.errorMessage)
+      resetCaptcha()
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -87,9 +220,9 @@ export default function Pricing() {
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="relative overflow-hidden rounded-2xl border border-primary/40 bg-gradient-to-b from-primary/10 to-bg-card p-8 shadow-[0_0_40px_rgba(14,165,233,0.1)]"
+            className="relative overflow-visible rounded-2xl border border-primary/40 bg-gradient-to-b from-primary/10 to-bg-card pt-10 pb-8 px-8 shadow-[0_0_40px_rgba(14,165,233,0.1)]"
           >
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-primary to-accent px-4 py-1 text-xs font-semibold text-white">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-primary to-accent px-5 py-2 text-xs font-semibold text-white whitespace-nowrap">
               {t.earlyAccess.formBadge}
             </div>
 
@@ -125,7 +258,7 @@ export default function Pricing() {
                         type="text"
                         required
                         value={formData.firstName}
-                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                        onChange={(e) => updateField('firstName', e.target.value)}
                         className="w-full rounded-xl border border-border bg-bg/50 px-4 py-3 text-sm text-text placeholder-text-dim outline-none transition-colors focus:border-primary"
                         placeholder="Janez"
                       />
@@ -139,7 +272,7 @@ export default function Pricing() {
                         type="text"
                         required
                         value={formData.lastName}
-                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                        onChange={(e) => updateField('lastName', e.target.value)}
                         className="w-full rounded-xl border border-border bg-bg/50 px-4 py-3 text-sm text-text placeholder-text-dim outline-none transition-colors focus:border-primary"
                         placeholder="Novak"
                       />
@@ -154,11 +287,21 @@ export default function Pricing() {
                       type="email"
                       required
                       value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      onChange={(e) => updateField('email', e.target.value)}
                       className="w-full rounded-xl border border-border bg-bg/50 px-4 py-3 text-sm text-text placeholder-text-dim outline-none transition-colors focus:border-primary"
                       placeholder="janez@example.com"
                     />
                   </div>
+                  {recaptchaSiteKey ? (
+                    <div>
+                      <div ref={captchaContainerRef} />
+                    </div>
+                  ) : null}
+                  {error ? (
+                    <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                      {error}
+                    </p>
+                  ) : null}
                   <button
                     type="submit"
                     disabled={submitting}
