@@ -15,6 +15,10 @@ const notifyTo = process.env.NOTIFY_TO || 'info@verival.si'
 const allowedOrigin = process.env.ALLOWED_ORIGIN
 const port = Number(process.env.PORT || 3001)
 const recaptchaSecretKey = process.env.RECAPTCHA_SECRET_KEY
+const recaptchaSiteKey = process.env.RECAPTCHA_SITE_KEY
+const recaptchaProjectId = process.env.RECAPTCHA_PROJECT_ID
+const recaptchaApiKey = process.env.RECAPTCHA_API_KEY
+const recaptchaExpectedAction = process.env.RECAPTCHA_EXPECTED_ACTION || ''
 const recaptchaVerifyUrl = process.env.RECAPTCHA_VERIFY_URL || 'https://www.google.com/recaptcha/api/siteverify'
 
 app.use(express.json())
@@ -28,15 +32,40 @@ function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 }
 
-async function verifyRecaptcha(token, remoteIp) {
-  if (!recaptchaSecretKey) {
-    return true
-  }
+async function verifyRecaptchaEnterprise(token) {
+  const url = `https://recaptcha.enterprise.googleapis.com/v1/projects/${recaptchaProjectId}/assessments?key=${recaptchaApiKey}`
 
-  if (!token) {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      event: {
+        token,
+        siteKey: recaptchaSiteKey,
+        ...(recaptchaExpectedAction ? { expectedAction: recaptchaExpectedAction } : {}),
+      },
+    }),
+  })
+
+  if (!response.ok) {
+    const detail = await response.text().catch(() => '')
+    console.error('reCAPTCHA Enterprise assessment request failed:', response.status, detail)
     return false
   }
 
+  const result = await response.json()
+  const valid = result?.tokenProperties?.valid === true
+
+  if (!valid) {
+    console.error('reCAPTCHA Enterprise token invalid:', result?.tokenProperties?.invalidReason)
+  }
+
+  return valid
+}
+
+async function verifyRecaptchaLegacy(token, remoteIp) {
   const body = new URLSearchParams()
   body.set('secret', recaptchaSecretKey)
   body.set('response', token)
@@ -58,6 +87,25 @@ async function verifyRecaptcha(token, remoteIp) {
 
   const result = await response.json()
   return result.success === true
+}
+
+async function verifyRecaptcha(token, remoteIp) {
+  const enterpriseConfigured = Boolean(recaptchaProjectId && recaptchaApiKey && recaptchaSiteKey)
+
+  // CAPTCHA fully disabled if nothing is configured.
+  if (!enterpriseConfigured && !recaptchaSecretKey) {
+    return true
+  }
+
+  if (!token) {
+    return false
+  }
+
+  if (enterpriseConfigured) {
+    return verifyRecaptchaEnterprise(token)
+  }
+
+  return verifyRecaptchaLegacy(token, remoteIp)
 }
 
 app.get('/health', (_req, res) => {

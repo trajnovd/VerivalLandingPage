@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Check, ArrowRight, Mail, Loader2 } from 'lucide-react'
 import { useLanguage } from '@/i18n/LanguageContext'
 
-type CaptchaApi = {
+type CaptchaRenderApi = {
   render: (
     container: HTMLElement,
     options: {
@@ -14,6 +14,11 @@ type CaptchaApi = {
     },
   ) => string | number
   reset: (widgetId?: string | number) => void
+  ready?: (cb: () => void) => void
+}
+
+type CaptchaApi = CaptchaRenderApi & {
+  enterprise?: CaptchaRenderApi
 }
 
 declare global {
@@ -39,19 +44,19 @@ export default function Pricing() {
   const [error, setError] = useState<string | null>(null)
   const [captchaToken, setCaptchaToken] = useState('')
 
-  const hasRenderableCaptcha = () =>
-    Boolean(window.grecaptcha && typeof window.grecaptcha.render === 'function')
+  const hasRenderableCaptcha = () => resolveCaptchaApi() !== null
 
-  const getRenderableCaptcha = () => {
-    if (!hasRenderableCaptcha()) {
-      return null
+  function resolveCaptchaApi(): CaptchaRenderApi | null {
+    const api = window.grecaptcha?.enterprise ?? window.grecaptcha
+    if (api && typeof api.render === 'function') {
+      return api
     }
 
-    return window.grecaptcha as CaptchaApi
+    return null
   }
 
   const resetCaptcha = () => {
-    const grecaptcha = getRenderableCaptcha()
+    const grecaptcha = resolveCaptchaApi()
     if (!recaptchaSiteKey || !grecaptcha) {
       return
     }
@@ -69,7 +74,7 @@ export default function Pricing() {
     }
 
     const renderWidget = () => {
-      const grecaptcha = getRenderableCaptcha()
+      const grecaptcha = resolveCaptchaApi()
       if (!grecaptcha || !captchaContainerRef.current || captchaWidgetIdRef.current !== null) {
         return
       }
@@ -90,6 +95,15 @@ export default function Pricing() {
       })
     }
 
+    const onScriptLoad = () => {
+      const api = window.grecaptcha?.enterprise ?? window.grecaptcha
+      if (api && typeof api.ready === 'function') {
+        api.ready(renderWidget)
+      } else {
+        renderWidget()
+      }
+    }
+
     const scriptId = 'google-recaptcha-script'
     const existingScript = document.getElementById(scriptId) as HTMLScriptElement | null
     if (existingScript) {
@@ -105,7 +119,7 @@ export default function Pricing() {
         replacementScript.src = 'https://www.google.com/recaptcha/api.js?render=explicit'
         replacementScript.async = true
         replacementScript.defer = true
-        replacementScript.addEventListener('load', renderWidget, { once: true })
+        replacementScript.addEventListener('load', onScriptLoad, { once: true })
         document.head.appendChild(replacementScript)
       }
       return
@@ -116,11 +130,11 @@ export default function Pricing() {
     script.src = 'https://www.google.com/recaptcha/api.js?render=explicit'
     script.async = true
     script.defer = true
-    script.addEventListener('load', renderWidget, { once: true })
+    script.addEventListener('load', onScriptLoad, { once: true })
     document.head.appendChild(script)
 
     return () => {
-      script.removeEventListener('load', renderWidget)
+      script.removeEventListener('load', onScriptLoad)
     }
   }, [recaptchaSiteKey, t.earlyAccess.captchaErrorMessage])
 
