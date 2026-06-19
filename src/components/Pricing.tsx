@@ -14,8 +14,6 @@ type CaptchaApi = {
     },
   ) => string | number
   reset: (widgetId?: string | number) => void
-  ready: (cb: () => void) => void
-  execute: (siteKey: string, options: { action: string }) => Promise<string>
 }
 
 declare global {
@@ -30,57 +28,75 @@ export default function Pricing() {
   const isInView = useInView(ref, { once: true, margin: '-100px' })
   const signupEndpoint = import.meta.env.VITE_SIGNUP_ENDPOINT ?? '/api/early-access'
   const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY
+  const captchaContainerRef = useRef<HTMLDivElement | null>(null)
+  const captchaWidgetIdRef = useRef<string | number | null>(null)
   const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '' })
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [recaptchaReady, setRecaptchaReady] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState('')
 
-  useEffect(() => {
-    if (!recaptchaSiteKey) {
-      setRecaptchaReady(false)
+  const resetCaptcha = () => {
+    if (!recaptchaSiteKey || !window.grecaptcha) {
       return
     }
 
+    if (captchaWidgetIdRef.current !== null) {
+      window.grecaptcha.reset(captchaWidgetIdRef.current)
+    }
+
+    setCaptchaToken('')
+  }
+
+  useEffect(() => {
+    if (!recaptchaSiteKey) {
+      return
+    }
+
+    const renderWidget = () => {
+      if (!window.grecaptcha || !captchaContainerRef.current || captchaWidgetIdRef.current !== null) {
+        return
+      }
+
+      captchaWidgetIdRef.current = window.grecaptcha.render(captchaContainerRef.current, {
+        sitekey: recaptchaSiteKey,
+        callback: (token) => {
+          setCaptchaToken(token)
+          setError(null)
+        },
+        'expired-callback': () => {
+          setCaptchaToken('')
+        },
+        'error-callback': () => {
+          setCaptchaToken('')
+          setError(t.earlyAccess.captchaErrorMessage)
+        },
+      })
+    }
+
     const scriptId = 'google-recaptcha-script'
-    const existingScript = document.getElementById(scriptId)
+    const existingScript = document.getElementById(scriptId) as HTMLScriptElement | null
     if (existingScript) {
       if (window.grecaptcha) {
-        window.grecaptcha.ready(() => {
-          setRecaptchaReady(true)
-        })
+        renderWidget()
       } else {
-        existingScript.addEventListener('load', () => {
-          window.grecaptcha?.ready(() => {
-            setRecaptchaReady(true)
-          })
-        }, { once: true })
+        existingScript.addEventListener('load', renderWidget, { once: true })
       }
       return
     }
 
     const script = document.createElement('script')
     script.id = scriptId
-    script.src = `https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(recaptchaSiteKey)}`
+    script.src = 'https://www.google.com/recaptcha/api.js?render=explicit'
     script.async = true
     script.defer = true
-    script.onload = () => {
-      if (!window.grecaptcha) {
-        return
-      }
-
-      window.grecaptcha.ready(() => {
-        setRecaptchaReady(true)
-      })
-    }
+    script.addEventListener('load', renderWidget, { once: true })
     document.head.appendChild(script)
 
-    if (window.grecaptcha) {
-      window.grecaptcha.ready(() => {
-        setRecaptchaReady(true)
-      })
+    return () => {
+      script.removeEventListener('load', renderWidget)
     }
-  }, [recaptchaSiteKey])
+  }, [recaptchaSiteKey, t.earlyAccess.captchaErrorMessage])
 
   const updateField = (field: 'firstName' | 'lastName' | 'email', value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -96,33 +112,10 @@ export default function Pricing() {
     setError(null)
 
     try {
-      let captchaToken = ''
-
-      // Get reCAPTCHA v3 token right before submit.
-      if (recaptchaSiteKey) {
-        if (!window.grecaptcha || !recaptchaReady) {
-          setError(t.earlyAccess.captchaErrorMessage)
-          setSubmitting(false)
-          return
-        }
-
-        try {
-          await new Promise<void>((resolve) => {
-            window.grecaptcha?.ready(() => resolve())
-          })
-          captchaToken = await window.grecaptcha.execute(recaptchaSiteKey, { action: 'submit' })
-
-          if (!captchaToken) {
-            setError(t.earlyAccess.captchaErrorMessage)
-            setSubmitting(false)
-            return
-          }
-        } catch (err) {
-          console.error('reCAPTCHA execute failed:', err)
-          setError(t.earlyAccess.captchaErrorMessage)
-          setSubmitting(false)
-          return
-        }
+      if (recaptchaSiteKey && !captchaToken) {
+        setError(t.earlyAccess.captchaRequiredMessage)
+        setSubmitting(false)
+        return
       }
 
       const response = await fetch(signupEndpoint, {
@@ -146,6 +139,7 @@ export default function Pricing() {
           setError(t.earlyAccess.errorMessage)
         }
 
+        resetCaptcha()
         return
       }
 
@@ -153,6 +147,7 @@ export default function Pricing() {
     } catch (submitError) {
       console.error('Early access submission failed:', submitError)
       setError(t.earlyAccess.errorMessage)
+      resetCaptcha()
     } finally {
       setSubmitting(false)
     }
@@ -297,6 +292,11 @@ export default function Pricing() {
                       placeholder="janez@example.com"
                     />
                   </div>
+                  {recaptchaSiteKey ? (
+                    <div>
+                      <div ref={captchaContainerRef} />
+                    </div>
+                  ) : null}
                   {error ? (
                     <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
                       {error}
