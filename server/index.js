@@ -57,6 +57,15 @@ async function verifyRecaptcha(token, remoteIp) {
   }
 
   const result = await response.json()
+  
+  // reCAPTCHA v3 returns success: true and a score (0.0-1.0)
+  // v2 returns only success: true
+  // For v3, accept score >= 0.5 (adjust threshold as needed)
+  if (result.score !== undefined) {
+    return result.success === true && result.score >= 0.5
+  }
+  
+  // For v2, just check success
   return result.success === true
 }
 

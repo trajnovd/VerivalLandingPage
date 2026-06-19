@@ -28,77 +28,29 @@ export default function Pricing() {
   const isInView = useInView(ref, { once: true, margin: '-100px' })
   const signupEndpoint = import.meta.env.VITE_SIGNUP_ENDPOINT ?? '/api/early-access'
   const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY
-  const captchaContainerRef = useRef<HTMLDivElement | null>(null)
-  const captchaWidgetIdRef = useRef<string | number | null>(null)
   const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '' })
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [captchaToken, setCaptchaToken] = useState('')
-
-  const resetCaptcha = () => {
-    if (!recaptchaSiteKey || !window.grecaptcha) {
-      return
-    }
-
-    if (captchaWidgetIdRef.current !== null) {
-      window.grecaptcha.reset(captchaWidgetIdRef.current)
-    }
-    setCaptchaToken('')
-  }
 
   useEffect(() => {
-    if (!recaptchaSiteKey || !captchaContainerRef.current) {
-      return
-    }
-
-    const renderWidget = () => {
-      if (!window.grecaptcha || !captchaContainerRef.current || captchaWidgetIdRef.current !== null) {
-        return
-      }
-
-      captchaWidgetIdRef.current = window.grecaptcha.render(captchaContainerRef.current, {
-        sitekey: recaptchaSiteKey,
-        callback: (token) => {
-          setCaptchaToken(token)
-          setError(null)
-        },
-        'expired-callback': () => {
-          setCaptchaToken('')
-        },
-        'error-callback': () => {
-          setCaptchaToken('')
-          setError(t.earlyAccess.captchaErrorMessage)
-        },
-      })
-    }
-
-    if (window.grecaptcha) {
-      renderWidget()
+    if (!recaptchaSiteKey) {
       return
     }
 
     const scriptId = 'google-recaptcha-script'
-    const existingScript = document.getElementById(scriptId) as HTMLScriptElement | null
+    const existingScript = document.getElementById(scriptId)
     if (existingScript) {
-      existingScript.addEventListener('load', renderWidget, { once: true })
-      return () => {
-        existingScript.removeEventListener('load', renderWidget)
-      }
+      return
     }
 
     const script = document.createElement('script')
     script.id = scriptId
-  script.src = 'https://www.google.com/recaptcha/api.js?render=explicit'
+    script.src = 'https://www.google.com/recaptcha/api.js'
     script.async = true
     script.defer = true
-    script.addEventListener('load', renderWidget, { once: true })
     document.head.appendChild(script)
-
-    return () => {
-      script.removeEventListener('load', renderWidget)
-    }
-  }, [recaptchaSiteKey, t.earlyAccess.captchaErrorMessage])
+  }, [recaptchaSiteKey])
 
   const updateField = (field: 'firstName' | 'lastName' | 'email', value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -109,15 +61,25 @@ export default function Pricing() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (recaptchaSiteKey && !captchaToken) {
-      setError(t.earlyAccess.captchaRequiredMessage)
-      return
-    }
 
     setSubmitting(true)
     setError(null)
 
     try {
+      let captchaToken = ''
+      
+      // Get reCAPTCHA v3 token
+      if (recaptchaSiteKey && window.grecaptcha) {
+        try {
+          captchaToken = await window.grecaptcha.execute(recaptchaSiteKey, { action: 'submit' })
+        } catch (err) {
+          console.error('reCAPTCHA execute failed:', err)
+          setError(t.earlyAccess.captchaErrorMessage)
+          setSubmitting(false)
+          return
+        }
+      }
+
       const response = await fetch(signupEndpoint, {
         method: 'POST',
         headers: {
@@ -139,7 +101,6 @@ export default function Pricing() {
           setError(t.earlyAccess.errorMessage)
         }
 
-        resetCaptcha()
         return
       }
 
@@ -147,7 +108,6 @@ export default function Pricing() {
     } catch (submitError) {
       console.error('Early access submission failed:', submitError)
       setError(t.earlyAccess.errorMessage)
-      resetCaptcha()
     } finally {
       setSubmitting(false)
     }
@@ -292,11 +252,6 @@ export default function Pricing() {
                       placeholder="janez@example.com"
                     />
                   </div>
-                  {recaptchaSiteKey ? (
-                    <div>
-                      <div ref={captchaContainerRef} />
-                    </div>
-                  ) : null}
                   {error ? (
                     <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
                       {error}
