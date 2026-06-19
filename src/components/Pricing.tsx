@@ -14,6 +14,7 @@ type CaptchaApi = {
     },
   ) => string | number
   reset: (widgetId?: string | number) => void
+  execute: (siteKey: string, options: { action: string }) => Promise<string>
 }
 
 declare global {
