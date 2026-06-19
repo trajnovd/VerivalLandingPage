@@ -38,12 +38,24 @@ export default function Pricing() {
 
   useEffect(() => {
     if (!recaptchaSiteKey) {
+      setRecaptchaReady(false)
       return
     }
 
     const scriptId = 'google-recaptcha-script'
     const existingScript = document.getElementById(scriptId)
     if (existingScript) {
+      if (window.grecaptcha) {
+        window.grecaptcha.ready(() => {
+          setRecaptchaReady(true)
+        })
+      } else {
+        existingScript.addEventListener('load', () => {
+          window.grecaptcha?.ready(() => {
+            setRecaptchaReady(true)
+          })
+        }, { once: true })
+      }
       return
     }
 
