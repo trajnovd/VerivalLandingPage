@@ -19,6 +19,7 @@ type CaptchaApi = {
 declare global {
   interface Window {
     grecaptcha?: CaptchaApi
+    __ENV__?: { RECAPTCHA_SITE_KEY?: string }
   }
 }
 
@@ -27,7 +28,9 @@ export default function Pricing() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
   const signupEndpoint = import.meta.env.VITE_SIGNUP_ENDPOINT ?? '/api/early-access'
-  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY
+  const recaptchaSiteKey =
+    (typeof window !== 'undefined' ? window.__ENV__?.RECAPTCHA_SITE_KEY : '') ||
+    import.meta.env.VITE_RECAPTCHA_SITE_KEY
   const captchaContainerRef = useRef<HTMLDivElement | null>(null)
   const captchaWidgetIdRef = useRef<string | number | null>(null)
   const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '' })
