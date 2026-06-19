@@ -36,13 +36,25 @@ export default function Pricing() {
   const [error, setError] = useState<string | null>(null)
   const [captchaToken, setCaptchaToken] = useState('')
 
+  const hasRenderableCaptcha = () =>
+    Boolean(window.grecaptcha && typeof window.grecaptcha.render === 'function')
+
+  const getRenderableCaptcha = () => {
+    if (!hasRenderableCaptcha()) {
+      return null
+    }
+
+    return window.grecaptcha as CaptchaApi
+  }
+
   const resetCaptcha = () => {
-    if (!recaptchaSiteKey || !window.grecaptcha) {
+    const grecaptcha = getRenderableCaptcha()
+    if (!recaptchaSiteKey || !grecaptcha) {
       return
     }
 
     if (captchaWidgetIdRef.current !== null) {
-      window.grecaptcha.reset(captchaWidgetIdRef.current)
+      grecaptcha.reset(captchaWidgetIdRef.current)
     }
 
     setCaptchaToken('')
@@ -54,11 +66,12 @@ export default function Pricing() {
     }
 
     const renderWidget = () => {
-      if (!window.grecaptcha || !captchaContainerRef.current || captchaWidgetIdRef.current !== null) {
+      const grecaptcha = getRenderableCaptcha()
+      if (!grecaptcha || !captchaContainerRef.current || captchaWidgetIdRef.current !== null) {
         return
       }
 
-      captchaWidgetIdRef.current = window.grecaptcha.render(captchaContainerRef.current, {
+      captchaWidgetIdRef.current = grecaptcha.render(captchaContainerRef.current, {
         sitekey: recaptchaSiteKey,
         callback: (token) => {
           setCaptchaToken(token)
@@ -77,10 +90,20 @@ export default function Pricing() {
     const scriptId = 'google-recaptcha-script'
     const existingScript = document.getElementById(scriptId) as HTMLScriptElement | null
     if (existingScript) {
-      if (window.grecaptcha) {
+      if (hasRenderableCaptcha()) {
         renderWidget()
       } else {
-        existingScript.addEventListener('load', renderWidget, { once: true })
+        existingScript.remove()
+        ;(window as Window & { grecaptcha?: CaptchaApi }).grecaptcha = undefined
+        captchaWidgetIdRef.current = null
+
+        const replacementScript = document.createElement('script')
+        replacementScript.id = scriptId
+        replacementScript.src = 'https://www.google.com/recaptcha/api.js?render=explicit'
+        replacementScript.async = true
+        replacementScript.defer = true
+        replacementScript.addEventListener('load', renderWidget, { once: true })
+        document.head.appendChild(replacementScript)
       }
       return
     }
