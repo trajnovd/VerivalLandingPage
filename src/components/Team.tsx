@@ -31,7 +31,7 @@ const team = [
       si: 'Pooblaščena ocenjevalka vrednosti nepremičnin in strokovna nosilka domenskega področja v projektu reValu8. Magistrica ekonomije (finance) in univ. dipl. inž. elektrotehnike z več kot 15-letnimi izkušnjami v insolvenčnih postopkih, kjer so cenitve ključno orodje za odločanje.',
     },
     initials: 'EB',
-    image: '/images/ErminaBenderpp.png',
+    image: '/images/Ermina Bender pp.jpg',
   },
   {
     name: 'Mag. Risto Trajanov',

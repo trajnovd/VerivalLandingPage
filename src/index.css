@@ -20,6 +20,8 @@
   --color-amber-tint: hsl(38 92% 50% / 0.09);
   --color-emerald-ink: #047857;
   --color-emerald-tint: hsl(160 84% 39% / 0.08);
+  --color-red-ink: #b91c1c;
+  --color-red-tint: hsl(0 84% 60% / 0.08);
 
   --font-display: 'Besley', Georgia, serif;
   --font-sans: 'Inter', system-ui, sans-serif;

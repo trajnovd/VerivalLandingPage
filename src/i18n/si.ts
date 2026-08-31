@@ -154,6 +154,9 @@ export const si = {
     submitting: 'Pošiljanje...',
     successHeading: 'Na seznamu si!',
     successMessage: 'Kmalu se oglasimo z naslednjimi koraki.',
+    errorMessage: 'Nekaj je šlo narobe. Poskusite znova ali nam pišite na support@verival.si.',
+    captchaRequiredMessage: 'Prosimo, potrdite CAPTCHA in poskusite znova.',
+    captchaErrorMessage: 'Preverjanje CAPTCHA ni uspelo. Poskusite znova.',
   },
   cta: {
     heading1: 'Bodite med prvimi.',

@@ -1,0 +1,12 @@
+services:
+  verival-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_RECAPTCHA_SITE_KEY: ${VITE_RECAPTCHA_SITE_KEY:-}
+    env_file:
+      - ./server/.env
+    ports:
+      - "18180:80"
+    restart: unless-stopped
