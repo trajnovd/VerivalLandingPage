@@ -1,96 +1,93 @@
-import { motion, useInView } from 'framer-motion'
-import { useRef } from 'react'
-import {
-  Database,
-  FileText,
-  BarChart3,
-  AlertTriangle,
-  FileCheck,
-  UserCheck,
-} from 'lucide-react'
 import { useLanguage } from '@/i18n/LanguageContext'
+import SectionHeader from './SectionHeader'
+import Reveal from './Reveal'
 
-const icons = [Database, FileText, BarChart3, AlertTriangle, FileCheck, UserCheck]
-const gradients = [
-  'from-blue-500/20 to-cyan-500/20',
-  'from-violet-500/20 to-purple-500/20',
-  'from-emerald-500/20 to-green-500/20',
-  'from-amber-500/20 to-orange-500/20',
-  'from-rose-500/20 to-pink-500/20',
-  'from-sky-500/20 to-blue-500/20',
-]
-const iconColors = ['text-blue-400', 'text-violet-400', 'text-emerald-400', 'text-amber-400', 'text-rose-400', 'text-sky-400']
-const spans = ['lg:col-span-2 lg:row-span-2', 'lg:col-span-1', 'lg:col-span-1', 'lg:col-span-1', 'lg:col-span-1', 'lg:col-span-2']
+function StatusBadge({ status }: { status: string }) {
+  const built = status === 'Built' || status === 'Zgrajeno'
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 font-mono text-[11px] font-medium ${
+        built ? 'bg-emerald-tint text-emerald-ink' : 'bg-amber-tint text-amber-ink'
+      }`}
+    >
+      <span
+        className={`h-1.5 w-1.5 rounded-full ${built ? 'bg-emerald-ink' : 'bg-amber-mark'}`}
+        aria-hidden="true"
+      />
+      {status}
+    </span>
+  )
+}
 
 export default function Features() {
   const { t } = useLanguage()
-  const sectionRef = useRef(null)
-  const isInView = useInView(sectionRef, { once: true, margin: '-100px' })
 
   return (
-    <section id="product" className="relative px-4 py-24 md:py-32">
+    <section id="product" className="scroll-mt-16 px-4 py-20 sm:px-6 md:py-28">
       <div className="mx-auto max-w-6xl">
-        <motion.div
-          ref={sectionRef}
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-          className="mb-16 text-center"
-        >
-          <span className="mb-4 inline-block rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm text-primary">
-            {t.features.label}
-          </span>
-          <h2 className="mb-4 font-heading text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-            {t.features.heading1}{' '}
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              {t.features.heading2}
-            </span>
-          </h2>
-          <p className="mx-auto max-w-2xl text-base text-text-muted md:text-lg">
-            {t.features.description}
-          </p>
-        </motion.div>
+        <SectionHeader
+          num="01"
+          label={t.features.label}
+          title={
+            <>
+              {t.features.heading1} <span className="italic">{t.features.heading2}</span>
+            </>
+          }
+          description={t.features.description}
+        />
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {t.features.items.map((feature, i) => {
-            const Icon = icons[i]
-            const ref = useRef(null)
-            const inView = useInView(ref, { once: true, margin: '-50px' })
+        <Reveal className="mt-10" delay={100}>
+          {/* Desktop: the report table itself */}
+          <div className="hidden overflow-hidden rounded-lg border border-line bg-card md:block">
+            <table className="report-table">
+              <thead>
+                <tr>
+                  <th scope="col" className="w-14">{t.features.table.num}</th>
+                  <th scope="col" className="w-64">{t.features.table.agent}</th>
+                  <th scope="col">{t.features.table.description}</th>
+                  <th scope="col" className="w-40">{t.features.table.status}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {t.features.items.map((feature, i) => (
+                  <tr key={feature.title}>
+                    <td className="font-mono text-xs text-ink-3">
+                      {String(i + 1).padStart(2, '0')}
+                    </td>
+                    <td className="text-sm font-semibold">{feature.title}</td>
+                    <td className="text-sm leading-relaxed text-ink-2">{feature.description}</td>
+                    <td>
+                      <StatusBadge status={feature.status} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-            return (
-              <motion.div
+          {/* Mobile: same rows, stacked */}
+          <div className="overflow-hidden rounded-lg border border-line bg-card md:hidden">
+            {t.features.items.map((feature, i) => (
+              <div
                 key={feature.title}
-                ref={ref}
-                initial={{ opacity: 0, y: 30 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: i * 0.1, ease: [0.25, 0.4, 0.25, 1] }}
-                className={`group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-bg-card p-6 transition-all duration-300 hover:border-text-dim hover:bg-bg-card-hover ${spans[i]}`}
+                className={`p-4 ${i > 0 ? 'border-t border-line' : ''} ${i % 2 === 1 ? 'bg-paper/60' : ''}`}
               >
-                <div className={`absolute inset-0 bg-gradient-to-br ${gradients[i]} opacity-0 transition-opacity duration-300 group-hover:opacity-100`} />
-                <div className="relative z-10">
-                  <div className="mb-4 flex items-center justify-between">
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-white/5 ${iconColors[i]}`}>
-                      <Icon className="h-6 w-6" />
-                    </div>
-                    <span className={`rounded-full px-3 py-1 text-xs font-medium ${
-                      feature.status === 'Built' || feature.status === 'Zgrajeno'
-                        ? 'bg-emerald-500/10 text-emerald-400'
-                        : 'bg-amber-500/10 text-amber-400'
-                    }`}>
-                      {feature.status}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-baseline gap-2.5">
+                    <span className="font-mono text-xs text-ink-3">
+                      {String(i + 1).padStart(2, '0')}
                     </span>
+                    <h3 className="font-sans text-sm font-semibold">{feature.title}</h3>
                   </div>
-                  <h3 className="mb-2 font-heading text-lg font-semibold text-text">
-                    {feature.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-text-muted">
-                    {feature.description}
-                  </p>
+                  <StatusBadge status={feature.status} />
                 </div>
-              </motion.div>
-            )
-          })}
-        </div>
+                <p className="mt-2 pl-7 text-sm leading-relaxed text-ink-2">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Reveal>
       </div>
     </section>
   )

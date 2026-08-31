@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Globe } from 'lucide-react'
+import { Menu, X, ArrowUpRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/i18n/LanguageContext'
+import Wordmark from './Wordmark'
+
+const APP_URL = 'https://revalu8.verival.si/'
 
 export default function Navbar() {
   const { lang, setLang, t } = useLanguage()
@@ -17,115 +19,99 @@ export default function Navbar() {
   ]
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50)
-    window.addEventListener('scroll', handleScroll)
+    const handleScroll = () => setScrolled(window.scrollY > 8)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   const toggleLang = () => setLang(lang === 'en' ? 'si' : 'en')
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50">
-      <motion.nav
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: [0.25, 0.4, 0.25, 1] }}
-        className={cn(
-          'mx-auto mt-4 flex max-w-5xl items-center justify-between rounded-2xl px-6 py-3 transition-all duration-300',
-          scrolled
-            ? 'bg-bg/60 border border-border backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)]'
-            : 'bg-transparent'
-        )}
-      >
-        <a href="#" className="flex items-center gap-2 font-heading text-xl font-bold tracking-tight">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z" />
-              <path d="M2 17l10 5 10-5" />
-              <path d="M2 12l10 5 10-5" />
-            </svg>
-          </div>
-          <span className="bg-gradient-to-r from-text to-text-muted bg-clip-text text-transparent">
-            VERIVAL
-          </span>
+    <header
+      className={cn(
+        'fixed top-0 left-0 right-0 z-50 bg-paper transition-[border-color] duration-200',
+        scrolled || mobileOpen ? 'border-b border-line' : 'border-b border-transparent'
+      )}
+    >
+      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+        <a href="#" aria-label="VERIVAL — home">
+          <Wordmark />
         </a>
 
-        <div className="hidden items-center gap-8 md:flex">
+        <div className="hidden items-center gap-7 lg:flex">
           {navItems.map((item) => (
             <a
               key={item.name}
               href={item.href}
-              className="text-sm text-text-muted transition-colors duration-200 hover:text-text"
+              className="text-sm text-ink-2 transition-colors duration-150 hover:text-ink"
             >
               {item.name}
             </a>
           ))}
         </div>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-3 lg:flex">
           <button
             onClick={toggleLang}
-            className="flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-2 text-sm text-text-muted transition-colors hover:text-text"
-            aria-label="Switch language"
+            className="cursor-pointer rounded-full border border-line bg-card px-3 py-1.5 font-mono text-xs font-medium text-ink-2 transition-colors hover:border-line-strong hover:text-ink"
+            aria-label={lang === 'en' ? 'Preklopi v slovenščino' : 'Switch to English'}
           >
-            <Globe className="h-4 w-4" />
-            <span className="font-medium">{lang === 'en' ? 'SI' : 'EN'}</span>
+            {lang === 'en' ? 'SI' : 'EN'}
           </button>
-          <a
-            href="#early-access"
-            className="cursor-pointer rounded-xl bg-gradient-to-r from-primary to-accent px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 hover:shadow-[0_0_20px_rgba(14,165,233,0.3)]"
-          >
+          <a href="#early-access" className="btn btn-ghost !h-9 !px-4">
             {t.nav.joinPilot}
+          </a>
+          <a href={APP_URL} target="_blank" rel="noopener" className="btn btn-primary !h-9 !px-4">
+            {t.nav.tryApp}
+            <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
           </a>
         </div>
 
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="cursor-pointer text-text-muted md:hidden"
+          className="cursor-pointer p-1 text-ink lg:hidden"
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={mobileOpen}
         >
-          {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
-      </motion.nav>
+      </nav>
 
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="mx-4 mt-2 rounded-2xl border border-border bg-bg/90 p-6 backdrop-blur-xl md:hidden"
-          >
-            <div className="flex flex-col gap-4">
-              {navItems.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="text-base text-text-muted transition-colors hover:text-text"
-                >
-                  {item.name}
-                </a>
-              ))}
-              <hr className="border-border" />
-              <button
-                onClick={toggleLang}
-                className="flex cursor-pointer items-center gap-1.5 text-base text-text-muted"
-              >
-                <Globe className="h-4 w-4" />
-                {lang === 'en' ? 'Slovenščina' : 'English'}
-              </button>
+      {mobileOpen && (
+        <div className="border-t border-line bg-paper px-4 pb-6 pt-4 sm:px-6 lg:hidden">
+          <div className="flex flex-col gap-4">
+            {navItems.map((item) => (
               <a
-                href="#early-access"
+                key={item.name}
+                href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className="cursor-pointer rounded-xl bg-gradient-to-r from-primary to-accent px-5 py-2.5 text-center text-sm font-semibold text-white"
+                className="text-base text-ink-2 transition-colors hover:text-ink"
               >
-                {t.nav.joinPilot}
+                {item.name}
               </a>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            ))}
+            <hr className="border-t border-line" />
+            <button
+              onClick={toggleLang}
+              className="cursor-pointer self-start rounded-full border border-line bg-card px-3 py-1.5 font-mono text-xs font-medium text-ink-2"
+            >
+              {lang === 'en' ? 'Slovenščina' : 'English'}
+            </button>
+            <a
+              href="#early-access"
+              onClick={() => setMobileOpen(false)}
+              className="btn btn-ghost w-full"
+            >
+              {t.nav.joinPilot}
+            </a>
+            <a href={APP_URL} target="_blank" rel="noopener" className="btn btn-primary w-full">
+              {t.nav.tryApp}
+              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </a>
+          </div>
+        </div>
+      )}
     </header>
   )
 }

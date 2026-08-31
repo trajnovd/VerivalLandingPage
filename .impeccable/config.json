@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "createdAt": "2026-08-31T14:41:28.193Z",
+        "reason": "User brief pins Inter as the Revalu8 body face; Besley is the display voice"
+      }
+    ]
+  }
+}

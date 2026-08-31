@@ -5,6 +5,7 @@ export const en = {
     earlyAccess: 'Early Access',
     about: 'About',
     joinPilot: 'Join Pilot',
+    tryApp: 'Try reValu8',
   },
   hero: {
     badge: 'Currently in Prototype Stage',
@@ -25,12 +26,15 @@ export const en = {
       { value: '4', label: 'Steps to a draft report' },
       { value: 'MSOV', label: 'Compliance in progress' },
     ],
+    statsCaption: 'Project facts',
+    exhibitNote: 'Illustrative excerpt — sample data',
   },
   features: {
     label: 'Product',
     heading1: 'Six AI Agents.',
     heading2: 'One Platform.',
     description: 'reValu8 is an AI-powered real estate valuation platform designed specifically for the Slovenian market and licensed valuers.',
+    table: { num: 'No.', agent: 'Agent', description: 'Scope', status: 'Status' },
     items: [
       {
         title: 'Automated Data Collection',

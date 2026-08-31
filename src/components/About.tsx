@@ -1,91 +1,74 @@
-import { motion, useInView } from 'framer-motion'
-import { useRef } from 'react'
 import { Shield, Eye, UserCheck, Scale } from 'lucide-react'
 import { useLanguage } from '@/i18n/LanguageContext'
+import SectionHeader from './SectionHeader'
+import Reveal from './Reveal'
 
 const valueIcons = [Shield, Eye, UserCheck, Scale]
 
 export default function About() {
   const { t } = useLanguage()
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: '-100px' })
 
   return (
-    <section id="about" className="relative px-4 py-24 md:py-32">
+    <section id="about" className="scroll-mt-16 px-4 py-20 sm:px-6 md:py-28">
       <div className="mx-auto max-w-6xl">
-        <div className="grid items-start gap-16 lg:grid-cols-2">
-          <motion.div
-            ref={ref}
-            initial={{ opacity: 0, x: -40 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, ease: [0.25, 0.4, 0.25, 1] }}
-          >
-            <span className="mb-4 inline-block rounded-full border border-accent/20 bg-accent/5 px-4 py-1.5 text-sm text-accent">
-              {t.about.label}
-            </span>
-            <h2 className="mb-6 font-heading text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-              {t.about.heading1}{' '}
-              <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                {t.about.heading2}
-              </span>
-            </h2>
-            <p className="mb-6 text-base leading-relaxed text-text-muted md:text-lg">
+        <SectionHeader
+          num="02"
+          label={t.about.label}
+          title={
+            <>
+              {t.about.heading1} <span className="italic">{t.about.heading2}</span>
+            </>
+          }
+        />
+
+        <div className="mt-10 grid gap-12 lg:grid-cols-2">
+          <Reveal>
+            <p className="text-base leading-relaxed text-ink-2 md:text-lg">
               {t.about.story1prefix}
-              <span className="font-semibold text-text">
-                {t.about.story1bold}
-              </span>
+              <span className="font-semibold text-ink">{t.about.story1bold}</span>
             </p>
-            <p className="mb-8 text-base leading-relaxed text-text-muted md:text-lg">
+            <p className="mt-5 text-base leading-relaxed text-ink-2 md:text-lg">
               {t.about.story2}
             </p>
 
-            <div className="grid grid-cols-2 gap-4">
-              {t.about.companyDetails.map((item) => (
-                <div key={item.label} className="rounded-xl border border-border bg-bg-card p-4">
-                  <div className="font-heading text-sm font-bold text-text">{item.value}</div>
-                  <div className="mt-1 text-xs text-text-dim">{item.label}</div>
-                </div>
-              ))}
+            {/* Company facts, set like the identification table of a report */}
+            <div className="mt-8 overflow-hidden rounded-lg border border-line bg-card">
+              <table className="report-table">
+                <tbody>
+                  {t.about.companyDetails.map((item) => (
+                    <tr key={item.label}>
+                      <th scope="row" className="w-40 !border-r !border-line">
+                        {item.label}
+                      </th>
+                      <td className="text-sm font-medium">{item.value}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </motion.div>
+          </Reveal>
 
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.25, 0.4, 0.25, 1] }}
-            className="space-y-6"
-          >
-            <h3 className="font-heading text-xl font-semibold text-text">{t.about.valuesHeading}</h3>
-            {t.about.values.map((value, i) => {
-              const Icon = valueIcons[i]
-              const isHighlighted = i < 2 // Trust and Transparency
-
-              return (
-                <div
-                  key={value.title}
-                  className={`rounded-2xl border p-6 transition-colors hover:border-text-dim ${
-                    isHighlighted
-                      ? 'border-primary/30 bg-gradient-to-br from-primary/[0.08] to-bg-card shadow-[0_0_20px_rgba(14,165,233,0.06)]'
-                      : 'border-border bg-bg-card'
-                  }`}
-                >
-                  <div className="mb-3 flex items-center gap-3">
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${
-                      isHighlighted ? 'bg-primary/10 text-primary' : 'bg-white/5 text-primary'
-                    }`}>
-                      <Icon className="h-5 w-5" />
+          <Reveal delay={100}>
+            <h3 className="font-sans text-sm font-semibold uppercase tracking-[0.1em] text-ink-3">
+              {t.about.valuesHeading}
+            </h3>
+            <ul className="mt-2 list-none divide-y divide-line p-0">
+              {t.about.values.map((value, i) => {
+                const Icon = valueIcons[i]
+                return (
+                  <li key={value.title} className="py-5">
+                    <div className="flex items-center gap-3">
+                      <Icon className="h-[18px] w-[18px] text-ink-3" aria-hidden="true" />
+                      <h4 className="m-0 font-sans text-base font-semibold">{value.title}</h4>
                     </div>
-                    <h4 className="font-heading text-base font-semibold text-text">
-                      {value.title}
-                    </h4>
-                  </div>
-                  <p className="text-sm leading-relaxed text-text-muted">
-                    {value.description}
-                  </p>
-                </div>
-              )
-            })}
-          </motion.div>
+                    <p className="mt-2 pl-[30px] text-sm leading-relaxed text-ink-2">
+                      {value.description}
+                    </p>
+                  </li>
+                )
+              })}
+            </ul>
+          </Reveal>
         </div>
       </div>
     </section>

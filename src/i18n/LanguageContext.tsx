@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { en } from './en'
 import { si } from './si'
 
@@ -14,6 +14,10 @@ const LanguageContext = createContext<{
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLang] = useState<Lang>('en')
   const t = lang === 'en' ? en : si
+
+  useEffect(() => {
+    document.documentElement.lang = lang === 'si' ? 'sl' : 'en'
+  }, [lang])
 
   return (
     <LanguageContext.Provider value={{ lang, setLang, t }}>

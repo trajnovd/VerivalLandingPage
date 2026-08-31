@@ -5,6 +5,7 @@ export const si = {
     earlyAccess: 'Zgodnji dostop',
     about: 'O nas',
     joinPilot: 'Pilotni program',
+    tryApp: 'Preizkusi reValu8',
   },
   hero: {
     badge: 'Trenutno v fazi prototipa',
@@ -25,12 +26,15 @@ export const si = {
       { value: '4', label: 'Koraki do poročila' },
       { value: 'MSOV', label: 'Skladnost v razvoju' },
     ],
+    statsCaption: 'Podatki o projektu',
+    exhibitNote: 'Ilustrativen prikaz — vzorčni podatki',
   },
   features: {
     label: 'Produkt',
     heading1: 'Šest AI agentov.',
     heading2: 'Ena platforma.',
     description: 'reValu8 je platforma za cenitve nepremičnin v razvoju, ki jo poganja umetna inteligenca. Zasnovana posebej za slovenski nepremičninski trg in pooblaščene cenilce.',
+    table: { num: 'Št.', agent: 'Agent', description: 'Obseg', status: 'Stanje' },
     items: [
       {
         title: 'Samodejno zbiranje podatkov',
